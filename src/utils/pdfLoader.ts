@@ -33,7 +33,7 @@ export async function pdfToProcessedImages(
     }).promise
 
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-    const thumbnailDataUrl = makeThumbnailFromImageData(imageData, canvas.width, canvas.height, 400)
+    const thumbnailDataUrl = makeThumbnailFromImageData(imageData, canvas.width, canvas.height, 1200)
 
     images.push({
       fileName: file.name,

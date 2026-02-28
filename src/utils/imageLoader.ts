@@ -10,7 +10,7 @@ export async function fileToProcessedImage(file: File): Promise<ProcessedImage> 
   const imageData = ctx.getImageData(0, 0, width, height)
   bitmap.close()
 
-  const thumbnailDataUrl = makeThumbnailFromImageData(imageData, width, height, 400)
+  const thumbnailDataUrl = makeThumbnailFromImageData(imageData, width, height, 1200)
 
   return {
     fileName: file.name,

@@ -27,7 +27,7 @@
 }
 
 /* --- Dark Theme --- */
-[data-theme='dark'] {
+[data-theme="dark"] {
   --bg-primary: #121212;
   --bg-secondary: #1e1e1e;
   --bg-tertiary: #2c2c3e;
@@ -60,8 +60,9 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    'Hiragino Sans', 'Noto Sans JP', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans",
+    "Noto Sans JP", sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   transition:
@@ -768,8 +769,8 @@ body {
 }
 
 .file-thumb {
-  width: auto;
-  height: 120px;
+  max-width: 100%;
+  height: 800px;
   object-fit: contain;
   border: 2px solid var(--border);
   border-radius: var(--radius);
@@ -808,12 +809,12 @@ body {
   border-color: rgba(26, 35, 126, 0.6);
 }
 
-[data-theme='dark'] .bbox-block {
+[data-theme="dark"] .bbox-block {
   background: rgba(121, 134, 203, 0.1);
   border-color: rgba(121, 134, 203, 0.3);
 }
 
-[data-theme='dark'] .bbox-block:hover {
+[data-theme="dark"] .bbox-block:hover {
   background: rgba(121, 134, 203, 0.2);
   border-color: rgba(121, 134, 203, 0.6);
 }
@@ -876,7 +877,7 @@ body {
   z-index: 10;
 }
 
-[data-theme='dark'] .selection-rect {
+[data-theme="dark"] .selection-rect {
   background: rgba(121, 134, 203, 0.08);
 }
 
