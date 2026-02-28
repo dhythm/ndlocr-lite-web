@@ -1,10 +1,12 @@
 import * as ort from 'onnxruntime-web'
 import type { WorkerRequest, WorkerResponse, InferenceTensorOutput } from './worker-protocol.ts'
+import { createModelCache, fetchModelWithCache } from '../storage/model-cache.ts'
 
 // Configure ONNX Runtime Web
 ort.env.wasm.numThreads = 1
 
 const sessions = new Map<string, ort.InferenceSession>()
+const modelCache = createModelCache()
 
 function postResponse(response: WorkerResponse): void {
   self.postMessage(response)
@@ -14,12 +16,10 @@ async function loadModel(modelUrl: string, modelId: string): Promise<void> {
   try {
     postResponse({ type: 'progress', message: `Loading model: ${modelId}`, progress: 0 })
 
-    const response = await fetch(modelUrl)
-    if (!response.ok) {
-      throw new Error(`Failed to fetch model: ${response.status} ${response.statusText}`)
-    }
+    const buffer = await fetchModelWithCache(modelUrl, modelCache, (progress) => {
+      postResponse({ type: 'progress', message: `Downloading: ${modelId}`, progress: progress * 0.5 })
+    })
 
-    const buffer = await response.arrayBuffer()
     postResponse({ type: 'progress', message: `Creating session: ${modelId}`, progress: 0.5 })
 
     const session = await ort.InferenceSession.create(buffer, {
