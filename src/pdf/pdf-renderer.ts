@@ -38,9 +38,11 @@ export async function renderPdfPages(
     const ctx = canvas.getContext('2d')
     if (!ctx) throw new Error('Failed to get 2D context')
 
+    // pdfjs-dist v5 requires `canvas` in RenderParameters
     await page.render({
       canvasContext: ctx as unknown as CanvasRenderingContext2D,
       viewport,
+      canvas: canvas as unknown as HTMLCanvasElement,
     }).promise
 
     const imageData = ctx.getImageData(0, 0, viewport.width, viewport.height)
