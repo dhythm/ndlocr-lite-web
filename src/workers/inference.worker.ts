@@ -1,0 +1,100 @@
+import * as ort from 'onnxruntime-web'
+import type { WorkerRequest, WorkerResponse, InferenceTensorOutput } from './worker-protocol.ts'
+
+// Configure ONNX Runtime Web
+ort.env.wasm.numThreads = 1
+
+const sessions = new Map<string, ort.InferenceSession>()
+
+function postResponse(response: WorkerResponse): void {
+  self.postMessage(response)
+}
+
+async function loadModel(modelUrl: string, modelId: string): Promise<void> {
+  try {
+    postResponse({ type: 'progress', message: `Loading model: ${modelId}`, progress: 0 })
+
+    const response = await fetch(modelUrl)
+    if (!response.ok) {
+      throw new Error(`Failed to fetch model: ${response.status} ${response.statusText}`)
+    }
+
+    const buffer = await response.arrayBuffer()
+    postResponse({ type: 'progress', message: `Creating session: ${modelId}`, progress: 0.5 })
+
+    const session = await ort.InferenceSession.create(buffer, {
+      executionProviders: ['wasm'],
+    })
+
+    sessions.set(modelId, session)
+    postResponse({ type: 'model-loaded', modelId })
+  } catch (error) {
+    postResponse({
+      type: 'error',
+      message: `Failed to load model: ${modelId}`,
+      detail: error instanceof Error ? error.message : String(error),
+    })
+  }
+}
+
+async function runInference(
+  modelId: string,
+  inputs: Array<{ name: string; data: Float32Array | BigInt64Array; dims: number[] }>,
+): Promise<void> {
+  const session = sessions.get(modelId)
+  if (!session) {
+    postResponse({ type: 'error', message: `Model not loaded: ${modelId}` })
+    return
+  }
+
+  try {
+    const feeds: Record<string, ort.Tensor> = {}
+    for (const input of inputs) {
+      if (input.data instanceof BigInt64Array) {
+        feeds[input.name] = new ort.Tensor('int64', input.data, input.dims)
+      } else {
+        feeds[input.name] = new ort.Tensor('float32', input.data, input.dims)
+      }
+    }
+
+    const results = await session.run(feeds)
+
+    const outputs: InferenceTensorOutput[] = Object.entries(results).map(([name, tensor]) => ({
+      name,
+      data: tensor.data as Float32Array,
+      dims: tensor.dims as number[],
+    }))
+
+    postResponse({ type: 'inference-result', outputs })
+  } catch (error) {
+    postResponse({
+      type: 'error',
+      message: `Inference failed for model: ${modelId}`,
+      detail: error instanceof Error ? error.message : String(error),
+    })
+  }
+}
+
+function disposeModel(modelId: string): void {
+  const session = sessions.get(modelId)
+  if (session) {
+    session.release()
+    sessions.delete(modelId)
+  }
+}
+
+self.onmessage = (event: MessageEvent<WorkerRequest>) => {
+  const message = event.data
+
+  switch (message.type) {
+    case 'load-model':
+      loadModel(message.modelUrl, message.modelId)
+      break
+    case 'run-inference':
+      runInference(message.modelId, message.inputs)
+      break
+    case 'dispose-model':
+      disposeModel(message.modelId)
+      break
+  }
+}

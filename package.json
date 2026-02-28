@@ -13,6 +13,7 @@
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
+    "onnxruntime-web": "^1.24.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
@@ -35,6 +36,8 @@
     "vitest": "^3.2.1"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild"]
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }
