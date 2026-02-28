@@ -867,6 +867,30 @@ body {
 }
 
 /* ============================================================
+   Preview Viewer
+   ============================================================ */
+.preview-viewer {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  user-select: none;
+  cursor: crosshair;
+  margin-top: 16px;
+}
+
+.preview-viewer__image {
+  width: 100%;
+  display: block;
+}
+
+.preview-viewer__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+/* ============================================================
    Selection Rectangle
    ============================================================ */
 .selection-rect {

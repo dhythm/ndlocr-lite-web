@@ -57,7 +57,8 @@ export function useOCRWorker() {
         if (msg.stage === 'initialized') {
           ocrWorkerReady = true
           checkBothReady()
-        } else {
+        } else if (!('id' in msg && msg.id)) {
+          // Only handle initialization progress (no id), not per-job progress
           setJobState((prev) => ({
             ...prev,
             status: 'loading_model',

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import './App.css'
 import { useI18n } from './hooks/useI18n'
 import { useOCRWorker } from './hooks/useOCRWorker'
@@ -8,6 +8,7 @@ import { Footer } from './components/layout/Footer'
 import { FileDropZone } from './components/upload/FileDropZone'
 import { ProgressBar } from './components/progress/ProgressBar'
 import { ImageViewer } from './components/viewer/ImageViewer'
+import { PreviewImageViewer } from './components/viewer/PreviewImageViewer'
 import { RegionOCRDialog } from './components/viewer/RegionOCRDialog'
 import { ResultPanel } from './components/results/ResultPanel'
 import { ResultActions } from './components/results/ResultActions'
@@ -16,6 +17,7 @@ import { SettingsModal } from './components/settings/SettingsModal'
 import type { OCRResult, TextBlock } from './types/ocr'
 import type { DBRunEntry } from './types/db'
 import { saveRunEntry } from './utils/db'
+import { imageDataToDataUrl } from './utils/imageLoader'
 
 type AppPhase = 'upload' | 'preview' | 'processing' | 'results'
 
@@ -36,6 +38,7 @@ function App() {
   })
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
+  const [previewIndex, setPreviewIndex] = useState(0)
 
   // Region OCR state
   const [regionImageData, setRegionImageData] = useState<ImageData | null>(null)
@@ -107,7 +110,14 @@ function App() {
     setRegionResult(null)
     setRegionProcessing(true)
     try {
-      const result = await processRegion(imageData)
+      // Clone imageData for the worker because processRegion transfers the buffer,
+      // which would detach the original and crash RegionOCRDialog's putImageData
+      const cloned = new ImageData(
+        new Uint8ClampedArray(imageData.data),
+        imageData.width,
+        imageData.height,
+      )
+      const result = await processRegion(cloned)
       setRegionResult(result)
     } catch (err) {
       console.error('Region OCR error:', err)
@@ -148,6 +158,12 @@ function App() {
     setPhase('results')
   }, [])
 
+  // Pre-generate full-resolution data URLs for preview (same approach as reference implementation)
+  const previewDataUrls = useMemo(
+    () => processedImages.map((img) => imageDataToDataUrl(img.imageData)),
+    [processedImages],
+  )
+
   const currentResult = results[selectedIndex]
   const isProcessing = phase === 'processing' || jobState.status === 'loading_model'
   const showProgress = isProcessing || (jobState.status === 'loading_model' && phase !== 'results')
@@ -186,17 +202,26 @@ function App() {
         <ProgressBar jobState={jobState} t={t} />
       )}
 
-      {phase === 'preview' && processedImages.length > 0 && !isProcessing && (
-        <div className="file-thumbnails">
-          {processedImages.map((img, i) => (
-            <img
-              key={i}
-              src={img.thumbnailDataUrl}
-              alt={img.fileName}
-              className="file-thumb"
-              title={img.pageIndex ? `${img.fileName} p.${img.pageIndex}` : img.fileName}
-            />
-          ))}
+      {phase === 'preview' && processedImages.length > 0 && (
+        <div>
+          <PreviewImageViewer
+            imageDataUrl={previewDataUrls[previewIndex] ?? ''}
+            onRegionSelect={isReady ? handleRegionSelect : undefined}
+          />
+          {processedImages.length > 1 && (
+            <div className="file-thumbnails">
+              {processedImages.map((img, i) => (
+                <img
+                  key={i}
+                  src={img.thumbnailDataUrl}
+                  alt={img.fileName}
+                  className={`file-thumb${i === previewIndex ? ' file-thumb--active' : ''}`}
+                  title={img.pageIndex ? `${img.fileName} p.${img.pageIndex}` : img.fileName}
+                  onClick={() => setPreviewIndex(i)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
 
