@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { PARSEQ_CHARSET, PARSEQ_CHARSET_SIZE } from './charset.ts'
 
 describe('charset', () => {
-  it('has 7143 characters', () => {
-    expect(PARSEQ_CHARSET).toHaveLength(7143)
+  it('has 7141 characters', () => {
+    expect(PARSEQ_CHARSET).toHaveLength(7141)
   })
 
   it('PARSEQ_CHARSET_SIZE matches array length', () => {
@@ -12,6 +12,17 @@ describe('charset', () => {
 
   it('starts with space character', () => {
     expect(PARSEQ_CHARSET[0]).toBe(' ')
+  })
+
+  it('has correct ASCII ordering at beginning', () => {
+    expect(PARSEQ_CHARSET[0]).toBe(' ')
+    expect(PARSEQ_CHARSET[1]).toBe('!')
+    expect(PARSEQ_CHARSET[2]).toBe('"')
+    expect(PARSEQ_CHARSET[3]).toBe('#')
+    expect(PARSEQ_CHARSET[27]).toBe(';')
+    expect(PARSEQ_CHARSET[59]).toBe('[')
+    expect(PARSEQ_CHARSET[60]).toBe('\\')
+    expect(PARSEQ_CHARSET[61]).toBe(']')
   })
 
   it('contains ASCII characters', () => {

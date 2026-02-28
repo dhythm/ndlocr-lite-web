@@ -110,27 +110,43 @@ export class TextRecognizer {
 
   private decodeOutput(outputs: Record<string, OrtType.Tensor>): RecognitionResult {
     const outputName = this.session!.outputNames[0]
-    const rawLogits = outputs[outputName].data as Float32Array
-    const logits = Array.from(rawLogits).map((v) =>
-      typeof v === 'bigint' ? Number(v) : v,
-    )
-
+    const output = outputs[outputName].data as Float32Array
     const dims = outputs[outputName].dims
     const [, seqLength, vocabSize] = dims
+    const vocabSizeN = Number(vocabSize)
 
     const resultClassIds: number[] = []
+    let totalLogProb = 0
 
-    for (let i = 0; i < seqLength; i++) {
-      const scores = logits.slice(i * vocabSize, (i + 1) * vocabSize)
-      const maxScore = Math.max(...scores)
-      const maxIndex = scores.indexOf(maxScore)
+    for (let pos = 0; pos < seqLength; pos++) {
+      const offset = pos * vocabSizeN
 
-      if (maxIndex === 0) break // <eos>
-      if (maxIndex < 4) continue // <s>, </s>, <pad>
-      resultClassIds.push(maxIndex - 1)
+      // Find argmax
+      let maxIdx = 0
+      let maxVal = output[offset]
+      for (let v = 1; v < vocabSizeN; v++) {
+        if (output[offset + v] > maxVal) {
+          maxVal = output[offset + v]
+          maxIdx = v
+        }
+      }
+
+      // Index 0 = EOS
+      if (maxIdx === 0) break
+      // Indices 1-3 = special tokens (<s>, </s>, <pad>)
+      if (maxIdx < 4) continue
+
+      // Softmax probability for confidence
+      let expSum = 0
+      for (let v = 0; v < vocabSizeN; v++) {
+        expSum += Math.exp(output[offset + v] - maxVal)
+      }
+      totalLogProb += Math.log(1 / expSum)
+
+      resultClassIds.push(maxIdx - 1)
     }
 
-    // Deduplicate consecutive IDs
+    // Deduplicate consecutive IDs and map to characters
     const resultChars: string[] = []
     let prevId = -1
     for (const id of resultClassIds) {
@@ -140,10 +156,11 @@ export class TextRecognizer {
       }
     }
 
-    return {
-      text: resultChars.join('').trim(),
-      confidence: 0.9,
-    }
+    const confidence = resultClassIds.length > 0
+      ? Math.exp(totalLogProb / resultClassIds.length)
+      : 0
+
+    return { text: resultChars.join('').trim(), confidence }
   }
 
   dispose(): void {

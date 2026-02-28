@@ -1,6 +1,6 @@
 import * as pdfjsLib from 'pdfjs-dist'
 import type { ProcessedImage } from '../types/ocr'
-import { makeThumbnailDataUrl } from './imageLoader'
+import { makeThumbnailFromImageData } from './imageLoader'
 
 // Use the worker from pdfjs-dist
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
@@ -33,7 +33,7 @@ export async function pdfToProcessedImages(
     }).promise
 
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-    const thumbnailDataUrl = makeThumbnailDataUrl(canvas, canvas.width, canvas.height)
+    const thumbnailDataUrl = makeThumbnailFromImageData(imageData, canvas.width, canvas.height, 400)
 
     images.push({
       fileName: file.name,

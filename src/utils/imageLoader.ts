@@ -2,13 +2,15 @@ import type { ProcessedImage } from '../types/ocr'
 
 export async function fileToProcessedImage(file: File): Promise<ProcessedImage> {
   const bitmap = await createImageBitmap(file)
-  const canvas = new OffscreenCanvas(bitmap.width, bitmap.height)
+  const width = bitmap.width
+  const height = bitmap.height
+  const canvas = new OffscreenCanvas(width, height)
   const ctx = canvas.getContext('2d')!
   ctx.drawImage(bitmap, 0, 0)
-  const imageData = ctx.getImageData(0, 0, bitmap.width, bitmap.height)
+  const imageData = ctx.getImageData(0, 0, width, height)
   bitmap.close()
 
-  const thumbnailDataUrl = makeThumbnailDataUrl(canvas, bitmap.width, bitmap.height)
+  const thumbnailDataUrl = makeThumbnailFromImageData(imageData, width, height, 400)
 
   return {
     fileName: file.name,
@@ -24,6 +26,31 @@ export function imageDataToDataUrl(imageData: ImageData): string {
   const ctx = canvas.getContext('2d')!
   ctx.putImageData(imageData, 0, 0)
   return canvas.toDataURL('image/jpeg', 0.85)
+}
+
+export function makeThumbnailFromImageData(
+  imageData: ImageData,
+  width: number,
+  height: number,
+  maxWidth = 200,
+): string {
+  const scale = Math.min(1, maxWidth / width)
+  const thumbW = Math.round(width * scale)
+  const thumbH = Math.round(height * scale)
+
+  // Use HTMLCanvasElement for data URL generation (compatible with all contexts)
+  const sourceCanvas = document.createElement('canvas')
+  sourceCanvas.width = width
+  sourceCanvas.height = height
+  const sourceCtx = sourceCanvas.getContext('2d')!
+  sourceCtx.putImageData(imageData, 0, 0)
+
+  const thumbCanvas = document.createElement('canvas')
+  thumbCanvas.width = thumbW
+  thumbCanvas.height = thumbH
+  const thumbCtx = thumbCanvas.getContext('2d')!
+  thumbCtx.drawImage(sourceCanvas, 0, 0, thumbW, thumbH)
+  return thumbCanvas.toDataURL('image/jpeg', 0.7)
 }
 
 export function makeThumbnailDataUrl(
