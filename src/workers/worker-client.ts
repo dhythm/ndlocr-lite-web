@@ -24,7 +24,10 @@ export function createWorkerClient(worker: Worker) {
     }
 
     if (response.type === 'error') {
-      pendingReject?.(new Error(response.message))
+      const msg = response.detail
+        ? `${response.message}: ${response.detail}`
+        : response.message
+      pendingReject?.(new Error(msg))
       pendingResolve = null
       pendingReject = null
       return

@@ -4,6 +4,8 @@ import { createModelCache, fetchModelWithCache } from '../storage/model-cache.ts
 
 // Configure ONNX Runtime Web
 ort.env.wasm.numThreads = 1
+// Serve WASM files from public/ so they resolve correctly in Worker context
+ort.env.wasm.wasmPaths = '/'
 
 const sessions = new Map<string, ort.InferenceSession>()
 const modelCache = createModelCache()

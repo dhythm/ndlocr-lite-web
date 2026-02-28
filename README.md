@@ -3,6 +3,13 @@
 [ndlocr-lite](https://github.com/ndl-lab/ndlocr-lite)（国立国会図書館のOCRエンジン）をブラウザ完結で動作させるWebアプリケーションです。
 ONNX Runtime Web を使用し、サーバー通信なしにブラウザ内でレイアウト検出・文字認識を実行します。
 
+## 参考
+
+このプロジェクトは以下のリポジトリを参考にしています：
+
+- [ndlocr-lite](https://github.com/ndl-lab/ndlocr-lite)
+- [ndlocrlite-web](https://github.com/yuta1984/ndlocrlite-web)
+
 ## 機能
 
 - 画像（JPEG, PNG, WebP, BMP, TIFF）およびPDFのOCR処理

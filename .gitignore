@@ -21,5 +21,8 @@ yarn-error.log*
 # ONNX models (too large for git)
 public/models/*.onnx
 
+# ONNX Runtime WASM files (copied from node_modules)
+public/ort-wasm-*
+
 # tasks (local)
 tasks/
