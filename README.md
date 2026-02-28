@@ -1,4 +1,86 @@
-# ndlocr-lite-web
+# NDLOCR Lite Web
+
+[ndlocr-lite](https://github.com/ndl-lab/ndlocr-lite)（国立国会図書館のOCRエンジン）をブラウザ完結で動作させるWebアプリケーションです。
+ONNX Runtime Web を使用し、サーバー通信なしにブラウザ内でレイアウト検出・文字認識を実行します。
+
+## 機能
+
+- 画像（JPEG, PNG, WebP, BMP, TIFF）およびPDFのOCR処理
+- DEIM によるレイアウト検出（17クラス）
+- PARSeq による文字認識（7143文字対応、3段階カスケード）
+- XY-Cut アルゴリズムによる読み順整序
+- 結果のエクスポート（TXT / JSON / PAGE XML）
+- IndexedDB によるモデルキャッシュ（2回目以降の高速ロード）
+- PWA対応（オフライン動作可能）
+
+## セットアップ
+
+### 前提条件
+
+- Node.js 18+
+- pnpm
+
+### インストール
+
+```bash
+pnpm install
+```
+
+### モデルファイルの配置
+
+ONNXモデルファイルが `public/models/` に必要です。ndlocr-liteリポジトリから取得します:
+
+```bash
+# 自動ダウンロード（約147MB）
+curl -L -o public/models/deim-s-1024x1024.onnx \
+  "https://raw.githubusercontent.com/ndl-lab/ndlocr-lite/master/src/model/deim-s-1024x1024.onnx"
+
+curl -L -o public/models/parseq-ndl-16x256-30-tiny-192epoch-tegaki3.onnx \
+  "https://raw.githubusercontent.com/ndl-lab/ndlocr-lite/master/src/model/parseq-ndl-16x256-30-tiny-192epoch-tegaki3.onnx"
+
+curl -L -o public/models/parseq-ndl-16x384-50-tiny-146epoch-tegaki2.onnx \
+  "https://raw.githubusercontent.com/ndl-lab/ndlocr-lite/master/src/model/parseq-ndl-16x384-50-tiny-146epoch-tegaki2.onnx"
+
+curl -L -o public/models/parseq-ndl-16x768-100-tiny-165epoch-tegaki2.onnx \
+  "https://raw.githubusercontent.com/ndl-lab/ndlocr-lite/master/src/model/parseq-ndl-16x768-100-tiny-165epoch-tegaki2.onnx"
+```
+
+### 開発サーバー起動
+
+```bash
+pnpm dev
+```
+
+ブラウザで http://localhost:5173 を開きます。
+
+### テスト
+
+```bash
+pnpm test        # ウォッチモード
+pnpm test:run    # 1回実行
+```
+
+### ビルド
+
+```bash
+pnpm build
+```
+
+ビルド成果物は `dist/` に出力されます。
+
+## 技術スタック
+
+- **ビルド**: Vite + React + TypeScript
+- **推論**: onnxruntime-web (WASM)
+- **並列化**: Web Worker
+- **PDF**: pdfjs-dist
+- **キャッシュ**: IndexedDB
+- **オフライン**: PWA (Service Worker via vite-plugin-pwa)
+- **テスト**: vitest + @testing-library/react
+
+## ライセンス
+
+モデルファイルのライセンスは [ndlocr-lite](https://github.com/ndl-lab/ndlocr-lite) のライセンスに従います。
 
 ## Create environment
 
