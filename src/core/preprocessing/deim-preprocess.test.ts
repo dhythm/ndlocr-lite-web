@@ -13,26 +13,34 @@ function makeRgba(width: number, height: number, fill: [number, number, number] 
 }
 
 describe('DEIM_INPUT_SIZE', () => {
-  it('is 1024', () => {
-    expect(DEIM_INPUT_SIZE).toBe(1024)
+  it('is 800', () => {
+    expect(DEIM_INPUT_SIZE).toBe(800)
   })
 })
 
 describe('preprocessForDeim', () => {
-  it('produces tensor with correct shape [1,3,1024,1024]', () => {
+  it('produces tensor with correct shape [1,3,800,800]', () => {
     const data = makeRgba(100, 80)
     const result = preprocessForDeim(data, 80, 100)
 
-    expect(result.imageTensor).toHaveLength(1 * 3 * 1024 * 1024)
+    expect(result.imageTensor).toHaveLength(1 * 3 * 800 * 800)
   })
 
-  it('produces origTargetSizes with original dimensions', () => {
+  it('produces imShape with model input dimensions', () => {
     const data = makeRgba(200, 150)
     const result = preprocessForDeim(data, 150, 200)
 
-    expect(result.origTargetSizes).toHaveLength(2)
-    expect(result.origTargetSizes[0]).toBe(BigInt(150)) // height
-    expect(result.origTargetSizes[1]).toBe(BigInt(200)) // width
+    expect(result.imShape).toHaveLength(2)
+    expect(result.imShape[0]).toBe(BigInt(800)) // inputSize
+    expect(result.imShape[1]).toBe(BigInt(800)) // inputSize
+  })
+
+  it('preserves original dimensions', () => {
+    const data = makeRgba(200, 150)
+    const result = preprocessForDeim(data, 150, 200)
+
+    expect(result.originalHeight).toBe(150)
+    expect(result.originalWidth).toBe(200)
   })
 
   it('tensor values are ImageNet normalized', () => {
@@ -41,9 +49,6 @@ describe('preprocessForDeim', () => {
     const result = preprocessForDeim(data, 10, 10)
 
     // After ImageNet normalization, these values should be close to 0
-    // Check first pixel of first channel
-    // The image gets padded to square (10x10 is already square) then resized to 1024x1024
-    // Values in the non-padded area should be close to 0
     const val = result.imageTensor[0]
     expect(Math.abs(val)).toBeLessThan(0.1)
   })
@@ -52,7 +57,7 @@ describe('preprocessForDeim', () => {
     const data = makeRgba(200, 150)
     const result = preprocessForDeim(data, 150, 200)
 
-    expect(result.inputHeight).toBe(1024)
-    expect(result.inputWidth).toBe(1024)
+    expect(result.inputHeight).toBe(800)
+    expect(result.inputWidth).toBe(800)
   })
 })

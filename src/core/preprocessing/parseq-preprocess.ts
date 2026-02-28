@@ -1,6 +1,6 @@
 import type { ParseqModelSize } from '../pipeline/types.ts'
-import { normalizeMinusOneToOne, reverseChannels, transposeHWCtoCHW } from './image-utils.ts'
-import { resizeBilinear, rotate90Clockwise } from './resize.ts'
+import { normalizeMinusOneToOne, transposeHWCtoCHW } from './image-utils.ts'
+import { resizeBilinear, rotate90CounterClockwise } from './resize.ts'
 
 export const PARSEQ_HEIGHTS = {
   small: 16,
@@ -31,12 +31,11 @@ export function selectParseqModelSize(predCharCount: number | undefined): Parseq
  * Preprocess a line image for PARSeq text recognition model.
  *
  * Pipeline:
- * 1. If portrait (h > w), rotate 90° clockwise
+ * 1. If portrait (h > w), rotate 90° counter-clockwise
  * 2. Resize to model input size (e.g., 768×16)
- * 3. RGB → BGR channel reversal
- * 4. Normalize to [-1, 1]: pixel/255 * 2.0 - 1.0
- * 5. HWC → CHW transpose
- * 6. Returns Float32Array [1, 3, 16, W]
+ * 3. Normalize to [-1, 1]: pixel/255 * 2.0 - 1.0
+ * 4. HWC → CHW transpose
+ * 5. Returns Float32Array [1, 3, 16, W]
  */
 export function preprocessForParseq(
   data: Uint8ClampedArray,
@@ -48,9 +47,9 @@ export function preprocessForParseq(
   let currentWidth = width
   let currentHeight = height
 
-  // 1. Rotate if portrait
+  // 1. Rotate if portrait (counter-clockwise for vertical text)
   if (currentHeight > currentWidth) {
-    const rotated = rotate90Clockwise(currentData, currentWidth, currentHeight)
+    const rotated = rotate90CounterClockwise(currentData, currentWidth, currentHeight)
     currentData = rotated.data
     currentWidth = rotated.width
     currentHeight = rotated.height
@@ -65,11 +64,8 @@ export function preprocessForParseq(
   // 3. Normalize to [-1, 1] (returns HWC Float32Array, RGB)
   const normalized = normalizeMinusOneToOne(resized.data, modelHeight, modelWidth)
 
-  // 4. RGB → BGR channel reversal (in HWC format)
-  const bgr = reverseChannels(normalized, modelHeight * modelWidth, 3)
-
-  // 5. HWC → CHW transpose
-  const chw = transposeHWCtoCHW(bgr, modelHeight, modelWidth, 3)
+  // 4. HWC → CHW transpose (RGB channels directly, no BGR reversal)
+  const chw = transposeHWCtoCHW(normalized, modelHeight, modelWidth, 3)
 
   return { tensor: chw, modelWidth }
 }

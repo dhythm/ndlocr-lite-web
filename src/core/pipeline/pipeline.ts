@@ -42,7 +42,7 @@ export async function runOcrPipeline(
 
   const deimOutputs = await client.runInference('deim', [
     { name: 'images', data: deimInput.imageTensor, dims: [1, 3, deimInput.inputHeight, deimInput.inputWidth] },
-    { name: 'orig_target_sizes', data: deimInput.origTargetSizes, dims: [1, 2] },
+    { name: 'im_shape', data: deimInput.imShape, dims: [1, 2] },
   ])
 
   // Parse DEIM outputs
@@ -62,8 +62,13 @@ export async function runOcrPipeline(
       scores: scoresOut.data,
       charCounts: charCountOut?.data,
     },
-    { height, width },
+    {
+      originalHeight: height,
+      originalWidth: width,
+      inputSize: deimInput.inputHeight,
+    },
     config.detConfThreshold,
+    config.detIouThreshold,
   )
 
   onProgress?.({ stage: 'detecting-layout', progress: 1, message: `Detected ${detections.length} regions` })

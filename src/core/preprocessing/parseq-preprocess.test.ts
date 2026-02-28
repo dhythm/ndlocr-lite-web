@@ -52,7 +52,7 @@ describe('preprocessForParseq', () => {
     expect(result.modelWidth).toBe(768)
   })
 
-  it('rotates portrait images 90 degrees', () => {
+  it('rotates portrait images 90 degrees counter-clockwise', () => {
     const data = makeRgba(16, 100) // portrait (w=16, h=100)
     const result = preprocessForParseq(data, 100, 16, 'large')
 
@@ -72,15 +72,13 @@ describe('preprocessForParseq', () => {
     expect(medium.tensor).toHaveLength(1 * 3 * 16 * 384)
   })
 
-  it('applies BGR channel reversal and [-1,1] normalization', () => {
+  it('applies [-1,1] normalization without BGR reversal', () => {
     // Create 1x1 image with R=255, G=0, B=0
     const data = new Uint8ClampedArray([255, 0, 0, 255])
     const result = preprocessForParseq(data, 1, 1, 'small')
 
-    // After BGR reversal: B=0, G=0, R=255
-    // After normalization: B = 0/255*2-1 = -1, G = -1, R = 255/255*2-1 = 1
-    // In CHW format: channel 0 (B), channel 1 (G), channel 2 (R)
-    // But image is resized to 16x256, so checking exact values is complex
+    // After normalization: R = 255/255*2-1 = 1, G = -1, B = -1
+    // In CHW format: channel 0 (R), channel 1 (G), channel 2 (B)
     // Just verify the tensor has valid values in [-1, 1] range
     for (let i = 0; i < result.tensor.length; i++) {
       expect(result.tensor[i]).toBeGreaterThanOrEqual(-1.001)

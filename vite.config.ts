@@ -3,6 +3,16 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  optimizeDeps: {
+    exclude: ['onnxruntime-web', 'onnxruntime-web/wasm'],
+  },
+  assetsInclude: ['**/*.wasm', '**/*.onnx'],
+  build: {
+    target: 'esnext',
+  },
+  worker: {
+    format: 'es' as const,
+  },
   plugins: [
     react(),
     VitePWA({

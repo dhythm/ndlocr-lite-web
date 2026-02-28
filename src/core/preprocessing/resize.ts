@@ -75,3 +75,31 @@ export function rotate90Clockwise(
 
   return { data: result, width: newWidth, height: newHeight }
 }
+
+/**
+ * Rotate an RGBA image 90 degrees counter-clockwise
+ */
+export function rotate90CounterClockwise(
+  data: Uint8ClampedArray,
+  width: number,
+  height: number,
+): { data: Uint8ClampedArray; width: number; height: number } {
+  const newWidth = height
+  const newHeight = width
+  const result = new Uint8ClampedArray(newWidth * newHeight * 4)
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const srcIdx = (y * width + x) * 4
+      const dstX = y
+      const dstY = width - 1 - x
+      const dstIdx = (dstY * newWidth + dstX) * 4
+      result[dstIdx] = data[srcIdx]
+      result[dstIdx + 1] = data[srcIdx + 1]
+      result[dstIdx + 2] = data[srcIdx + 2]
+      result[dstIdx + 3] = data[srcIdx + 3]
+    }
+  }
+
+  return { data: result, width: newWidth, height: newHeight }
+}

@@ -2,7 +2,7 @@ import type { DeimInput } from '../pipeline/types.ts'
 import { padToSquare, normalizeImageNet, transposeHWCtoCHW } from './image-utils.ts'
 import { resizeBilinear } from './resize.ts'
 
-export const DEIM_INPUT_SIZE = 1024
+export const DEIM_INPUT_SIZE = 800
 
 /**
  * Preprocess an image for DEIM layout detection model.
@@ -31,13 +31,15 @@ export function preprocessForDeim(
   // 4. HWC → CHW transpose
   const chw = transposeHWCtoCHW(normalized, DEIM_INPUT_SIZE, DEIM_INPUT_SIZE, 3)
 
-  // 5. origTargetSizes for DEIM model
-  const origTargetSizes = new BigInt64Array([BigInt(height), BigInt(width)])
+  // 5. im_shape for DEIM model (model input size, not original image size)
+  const imShape = new BigInt64Array([BigInt(DEIM_INPUT_SIZE), BigInt(DEIM_INPUT_SIZE)])
 
   return {
     imageTensor: chw,
-    origTargetSizes,
+    imShape,
     inputHeight: DEIM_INPUT_SIZE,
     inputWidth: DEIM_INPUT_SIZE,
+    originalHeight: height,
+    originalWidth: width,
   }
 }

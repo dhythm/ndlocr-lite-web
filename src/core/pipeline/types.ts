@@ -116,9 +116,11 @@ export type ProgressCallback = (info: ProgressInfo) => void
  */
 export type DeimInput = {
   readonly imageTensor: Float32Array
-  readonly origTargetSizes: BigInt64Array
+  readonly imShape: BigInt64Array
   readonly inputHeight: number
   readonly inputWidth: number
+  readonly originalHeight: number
+  readonly originalWidth: number
 }
 
 /**
@@ -130,9 +132,9 @@ export type ParseqModelSize = 'small' | 'medium' | 'large'
  * Default pipeline configuration
  */
 export const DEFAULT_PIPELINE_CONFIG: PipelineConfig = {
-  detConfThreshold: 0.25,
+  detConfThreshold: 0.3,
   detScoreThreshold: 0.2,
-  detIouThreshold: 0.2,
+  detIouThreshold: 0.5,
   deimModelUrl: '/models/deim-s-1024x1024.onnx',
   parseqModelUrls: {
     small: '/models/parseq-ndl-16x256-30-tiny-192epoch-tegaki3.onnx',

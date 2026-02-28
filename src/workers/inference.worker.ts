@@ -1,11 +1,13 @@
-import * as ort from 'onnxruntime-web'
+import * as ort from 'onnxruntime-web/wasm'
+import wasmUrl from 'onnxruntime-web/ort-wasm-simd-threaded.wasm?url'
 import type { WorkerRequest, WorkerResponse, InferenceTensorOutput } from './worker-protocol.ts'
 import { createModelCache, fetchModelWithCache } from '../storage/model-cache.ts'
 
 // Configure ONNX Runtime Web
 ort.env.wasm.numThreads = 1
-// Serve WASM files from public/ so they resolve correctly in Worker context
-ort.env.wasm.wasmPaths = '/'
+ort.env.wasm.wasmPaths = { wasm: wasmUrl }
+ort.env.wasm.proxy = false
+ort.env.logLevel = 'warning'
 
 const sessions = new Map<string, ort.InferenceSession>()
 const modelCache = createModelCache()
@@ -26,6 +28,10 @@ async function loadModel(modelUrl: string, modelId: string): Promise<void> {
 
     const session = await ort.InferenceSession.create(buffer, {
       executionProviders: ['wasm'],
+      logSeverityLevel: 4,
+      graphOptimizationLevel: 'basic',
+      enableCpuMemArena: false,
+      enableMemPattern: false,
     })
 
     sessions.set(modelId, session)
