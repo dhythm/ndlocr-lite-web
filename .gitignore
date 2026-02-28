@@ -1,13 +1,8 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
 
-# next.js
-/.next/
-/out/
-
-# production
+# build
+/dist
 /build
 
 # debug
@@ -20,9 +15,11 @@ yarn-error.log*
 .env*
 !.env*.example
 
-# vercel
-.vercel
-
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+
+# ONNX models (too large for git)
+public/models/*.onnx
+
+# tasks (local)
+tasks/
