@@ -1,0 +1,75 @@
+export const en = {
+  app: {
+    title: 'NDL OCR Lite Web',
+    subtitle: 'Browser-based Japanese OCR',
+  },
+  header: {
+    startOCR: 'Start OCR',
+    settings: 'Settings',
+    history: 'History',
+    darkMode: 'Dark Mode',
+    language: 'Language',
+  },
+  upload: {
+    dragDrop: 'Drag & drop images or PDF',
+    clickSelect: 'or click to select files',
+    pasteHint: 'Ctrl+V to paste from clipboard',
+    formats: 'Supported formats: JPEG, PNG, WebP, BMP, TIFF, PDF',
+    selectFolder: 'Select Folder',
+    sampleImage: 'Try with sample image',
+    loadingFile: 'Loading file...',
+    loadingPdf: 'Loading PDF ({current}/{total})...',
+  },
+  progress: {
+    loading_models: 'Loading models',
+    layout_detection: 'Detecting layout',
+    text_recognition: 'Recognizing text',
+    reading_order: 'Ordering reading sequence',
+    initializing: 'Initializing',
+    initialized: 'Ready',
+    initializing_models: 'Preparing models',
+  },
+  result: {
+    recognizedText: 'Recognized Text',
+    regions: 'Regions',
+    processingTime: 'Processing Time',
+    seconds: 'sec',
+    copy: 'Copy',
+    download: 'Download',
+    copied: 'Copied',
+    ignoreLineBreaks: 'Ignore line breaks',
+    includeFileName: 'Include file name',
+    noText: 'No text detected',
+    page: 'Page',
+  },
+  viewer: {
+    showBbox: 'Show bounding boxes',
+    dragToSelect: 'Drag to select region',
+    regionOCR: 'Region OCR Result',
+    close: 'Close',
+    processing: 'Processing...',
+  },
+  settings: {
+    title: 'Settings',
+    clearCache: 'Clear model cache',
+    cacheCleared: 'Cache cleared',
+    close: 'Close',
+  },
+  history: {
+    title: 'History',
+    empty: 'No history',
+    deleteAll: 'Delete All',
+    files: 'files',
+    close: 'Close',
+  },
+  footer: {
+    attribution:
+      'NDL OCR Lite Web is based on the National Diet Library digital materials OCR project.',
+    privacy:
+      'All processing is done in your browser. No image data is sent to any server.',
+  },
+  common: {
+    newFile: 'Process new file',
+    error: 'An error occurred',
+  },
+} as const

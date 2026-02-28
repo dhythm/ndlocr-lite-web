@@ -1,0 +1,75 @@
+export const ja = {
+  app: {
+    title: 'NDL OCR Lite Web',
+    subtitle: 'ブラウザ完結型 日本語OCR',
+  },
+  header: {
+    startOCR: '認識を開始',
+    settings: '設定',
+    history: '履歴',
+    darkMode: 'ダークモード',
+    language: '言語',
+  },
+  upload: {
+    dragDrop: '画像またはPDFをドラッグ&ドロップ',
+    clickSelect: 'またはクリックしてファイルを選択',
+    pasteHint: 'Ctrl+V でクリップボードから貼り付け',
+    formats: '対応形式: JPEG, PNG, WebP, BMP, TIFF, PDF',
+    selectFolder: 'フォルダを選択',
+    sampleImage: 'サンプル画像で試す',
+    loadingFile: 'ファイル読み込み中...',
+    loadingPdf: 'PDF読み込み中 ({current}/{total})...',
+  },
+  progress: {
+    loading_models: 'モデル読み込み中',
+    layout_detection: 'レイアウト検出中',
+    text_recognition: 'テキスト認識中',
+    reading_order: '読み順整序中',
+    initializing: '初期化中',
+    initialized: '準備完了',
+    initializing_models: 'モデル準備中',
+  },
+  result: {
+    recognizedText: '認識テキスト',
+    regions: '領域',
+    processingTime: '処理時間',
+    seconds: '秒',
+    copy: 'コピー',
+    download: 'ダウンロード',
+    copied: 'コピーしました',
+    ignoreLineBreaks: '改行を無視',
+    includeFileName: 'ファイル名を含む',
+    noText: 'テキストが検出されませんでした',
+    page: 'ページ',
+  },
+  viewer: {
+    showBbox: 'バウンディングボックスを表示',
+    dragToSelect: 'ドラッグで領域を選択',
+    regionOCR: '領域OCR結果',
+    close: '閉じる',
+    processing: '認識中...',
+  },
+  settings: {
+    title: '設定',
+    clearCache: 'モデルキャッシュをクリア',
+    cacheCleared: 'キャッシュをクリアしました',
+    close: '閉じる',
+  },
+  history: {
+    title: '実行履歴',
+    empty: '履歴がありません',
+    deleteAll: 'すべて削除',
+    files: 'ファイル',
+    close: '閉じる',
+  },
+  footer: {
+    attribution:
+      'NDL OCR Lite Web は国立国会図書館のデジタル化資料のOCRテキスト化プロジェクトに基づいています。',
+    privacy:
+      'すべての処理はブラウザ内で完結します。画像データはサーバーに送信されません。',
+  },
+  common: {
+    newFile: '新しいファイルを処理',
+    error: 'エラーが発生しました',
+  },
+} as const
