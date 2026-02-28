@@ -52,21 +52,3 @@ export function makeThumbnailFromImageData(
   thumbCtx.drawImage(sourceCanvas, 0, 0, thumbW, thumbH)
   return thumbCanvas.toDataURL('image/jpeg', 0.7)
 }
-
-export function makeThumbnailDataUrl(
-  source: OffscreenCanvas | HTMLCanvasElement,
-  width: number,
-  height: number,
-  maxWidth = 200,
-): string {
-  const scale = Math.min(1, maxWidth / width)
-  const thumbW = Math.round(width * scale)
-  const thumbH = Math.round(height * scale)
-
-  const canvas = document.createElement('canvas')
-  canvas.width = thumbW
-  canvas.height = thumbH
-  const ctx = canvas.getContext('2d')!
-  ctx.drawImage(source as unknown as CanvasImageSource, 0, 0, thumbW, thumbH)
-  return canvas.toDataURL('image/jpeg', 0.7)
-}

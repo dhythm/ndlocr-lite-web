@@ -12,9 +12,6 @@ function openDB(): Promise<IDBDatabase> {
     request.onsuccess = () => resolve(request.result)
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result
-      if (!db.objectStoreNames.contains('models')) {
-        db.createObjectStore('models', { keyPath: 'name' })
-      }
       if (db.objectStoreNames.contains('results')) {
         db.deleteObjectStore('results')
       }
@@ -54,17 +51,6 @@ export async function getRunEntries(): Promise<DBRunEntry[]> {
       }
     }
     request.onerror = () => reject(request.error)
-  })
-}
-
-export async function deleteRunEntry(id: string): Promise<void> {
-  const db = await openDB()
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction([STORE_NAME], 'readwrite')
-    const store = tx.objectStore(STORE_NAME)
-    store.delete(id)
-    tx.oncomplete = () => resolve()
-    tx.onerror = () => reject(tx.error)
   })
 }
 
